@@ -1,11 +1,12 @@
 // ignore_for_file: avoid_print
 
+import 'package:chat_app/components/dialog.dart';
 import 'package:chat_app/const/color.dart';
 import 'package:chat_app/firebase_auth/auth_services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -15,8 +16,6 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final AuthService _auth = AuthService();
-
   final _formKey = GlobalKey<FormState>();
   bool _isPwdObscure = true;
   bool _isPwd2Obscure = true;
@@ -257,15 +256,13 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _register() async {
-    String email = emailController.text;
-    String password = passwordController.text;
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final dialogWidgets = DialogWidgets(context);
 
-    User? user = await _auth.register(email, password);
-
-    if (user != null) {
-      print("register successful");
-    } else {
-      print('error');
+    try {
+      await authService.register(emailController.text, passwordController.text);
+    } catch (e) {
+      dialogWidgets.showErrorDialog(message: e.toString());
     }
   }
 }

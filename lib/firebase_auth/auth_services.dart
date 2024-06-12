@@ -1,8 +1,9 @@
 // ignore_for_file: avoid_print
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
-class AuthService {
+class AuthService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<User?> register(String email, String password) async {
@@ -11,9 +12,8 @@ class AuthService {
           email: email, password: password);
       return credential.user;
     } on FirebaseAuthException catch (e) {
-      print(e);
+      throw Exception(e.code);
     }
-    return null;
   }
 
   Future<User?> login(String email, String password) async {
@@ -22,8 +22,11 @@ class AuthService {
           email: email, password: password);
       return credential.user;
     } on FirebaseAuthException catch (e) {
-      print(e);
+      throw Exception(e.code);
     }
-    return null;
+  }
+
+  Future<void> logOut() async {
+    return _auth.signOut();
   }
 }

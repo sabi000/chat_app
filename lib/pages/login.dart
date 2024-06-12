@@ -1,11 +1,12 @@
 // ignore_for_file: avoid_print
 
+import 'package:chat_app/components/dialog.dart';
 import 'package:chat_app/const/color.dart';
 import 'package:chat_app/firebase_auth/auth_services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,7 +16,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
   bool _isPwdObscure = false;
 
@@ -187,15 +187,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _login() async {
-    String email = emailController.text;
-    String password = passwordController.text;
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final dialogWidgets = DialogWidgets(context);
 
-    User? user = await _auth.login(email, password);
-
-    if (user != null) {
-      print("login successful");
-    } else {
-      print('error');
+    try {
+      await authService.login(emailController.text, passwordController.text);
+    } catch (e) {
+      dialogWidgets.showErrorDialog(message: e.toString());
     }
   }
 }

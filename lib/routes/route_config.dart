@@ -1,11 +1,17 @@
+import 'package:chat_app/firebase_auth/auth_gate.dart';
 import 'package:chat_app/pages/landing.dart';
 import 'package:chat_app/pages/login.dart';
 import 'package:chat_app/pages/register.dart';
 import 'package:go_router/go_router.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: "/login",
+  initialLocation: "/",
   routes: <RouteBase>[
+    GoRoute(
+      path: "/",
+      name: 'init',
+      builder: (context, state) => const AuthGate(),
+    ),
     GoRoute(
       path: "/login",
       name: 'login',
