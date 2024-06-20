@@ -1,7 +1,8 @@
-import 'package:chat_app/firebase_auth/auth_gate.dart';
-import 'package:chat_app/pages/landing.dart';
-import 'package:chat_app/pages/login.dart';
-import 'package:chat_app/pages/register.dart';
+import 'package:chat_app/UI/chat/chatpage.dart';
+import 'package:chat_app/services/firebase_auth/auth_gate.dart';
+import 'package:chat_app/UI/chat/landing.dart';
+import 'package:chat_app/UI/auth/login.dart';
+import 'package:chat_app/UI/auth/register.dart';
 import 'package:go_router/go_router.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -26,6 +27,19 @@ final GoRouter appRouter = GoRouter(
       path: "/home",
       name: 'home',
       builder: (context, state) => const IndexPage(),
+    ),
+    GoRoute(
+      path: "/chatpage/:email/:id",
+      name: 'chatpage',
+      builder: (context, state) {
+        final String receiverUserEmail =
+            state.pathParameters['email'] ?? 'Unknown';
+        final String receiverUserID = state.pathParameters['id'] ?? 'Unknown';
+        return ChatPage(
+          receiverUserEmail: receiverUserEmail,
+          receiverUserID: receiverUserID,
+        );
+      },
     ),
   ],
 );

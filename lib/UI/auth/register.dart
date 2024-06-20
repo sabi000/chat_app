@@ -1,38 +1,45 @@
 // ignore_for_file: avoid_print
 
 import 'package:chat_app/components/dialog.dart';
-import 'package:chat_app/const/color.dart';
-import 'package:chat_app/firebase_auth/auth_services.dart';
+import 'package:chat_app/utils/color.dart';
+import 'package:chat_app/services/firebase_auth/auth_services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  bool _isPwdObscure = false;
+  bool _isPwdObscure = true;
+  bool _isPwd2Obscure = true;
 
-  late TextEditingController emailController = TextEditingController();
+  late TextEditingController usernameController = TextEditingController();
   late TextEditingController passwordController = TextEditingController();
+  late TextEditingController emailController = TextEditingController();
+  late TextEditingController password2Controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    emailController = TextEditingController();
+    usernameController = TextEditingController();
     passwordController = TextEditingController();
+    emailController = TextEditingController();
+    password2Controller = TextEditingController();
   }
 
   @override
   void dispose() {
-    emailController.dispose();
+    usernameController.dispose();
     passwordController.dispose();
+    emailController.dispose();
+    password2Controller.dispose();
     super.dispose();
   }
 
@@ -40,7 +47,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final isLandScape =
         MediaQuery.of(context).orientation == Orientation.landscape;
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -49,21 +55,21 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             isLandScape
                 ? const SizedBox(height: 40)
-                : const SizedBox(height: 250),
+                : const SizedBox(height: 180),
             const Center(
               child: Text.rich(
                 style: TextStyle(fontSize: 24),
                 TextSpan(
                   children: [
                     TextSpan(
-                      text: "Let's start ",
+                      text: "Start your ",
                     ),
                     TextSpan(
                       text: 'chat',
                       style: TextStyle(color: TColor.prime1),
                     ),
                     TextSpan(
-                      text: 'ting',
+                      text: 'ting journey.',
                     ),
                   ],
                 ),
@@ -82,18 +88,40 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(
                       height: 40,
                       child: TextFormField(
-                        controller: emailController,
+                        controller: usernameController,
                         textInputAction: TextInputAction.next,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Enter email';
+                            return 'Enter Username';
                           } else {
                             return null;
                           }
                         },
                         decoration: const InputDecoration(
-                            label: Text('EMAIL'),
+                            label: Text('USERNAME'),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: TColor.prime1)),
+                            floatingLabelBehavior: FloatingLabelBehavior.never),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      height: 40,
+                      child: TextFormField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Enter Email Address';
+                          } else {
+                            return null;
+                          }
+                        },
+                        decoration: const InputDecoration(
+                            label: Text('EMAIL ADDRESS'),
                             focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(color: TColor.prime1)),
                             floatingLabelBehavior: FloatingLabelBehavior.never),
@@ -104,14 +132,19 @@ class _LoginPageState extends State<LoginPage> {
                       height: 40,
                       child: TextFormField(
                         controller: passwordController,
-                        textInputAction: TextInputAction.done,
+                        textInputAction: TextInputAction.next,
                         obscureText: _isPwdObscure,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Enter Password';
                           } else {
-                            return null;
+                            if (password2Controller.text ==
+                                passwordController.text) {
+                              return null;
+                            } else {
+                              return 'Password Mismatch';
+                            }
                           }
                         },
                         decoration: InputDecoration(
@@ -132,6 +165,42 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 20),
                     SizedBox(
+                      height: 40,
+                      child: TextFormField(
+                        controller: password2Controller,
+                        textInputAction: TextInputAction.done,
+                        obscureText: _isPwd2Obscure,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Confirm Password';
+                          } else {
+                            if (password2Controller.text ==
+                                passwordController.text) {
+                              return null;
+                            } else {
+                              return 'Password Mismatch';
+                            }
+                          }
+                        },
+                        decoration: InputDecoration(
+                            suffixIcon: ExcludeFocus(
+                              child: IconButton(
+                                  icon: _isPwd2Obscure
+                                      ? const Icon(Icons.visibility)
+                                      : const Icon(Icons.visibility_off),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isPwd2Obscure = !_isPwd2Obscure;
+                                    });
+                                  }),
+                            ),
+                            label: const Text(' CONFIRM PASSWORD'),
+                            floatingLabelBehavior: FloatingLabelBehavior.never),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
                         width: MediaQuery.of(context).size.width * 0.5,
                         child: ElevatedButton(
                             style: ButtonStyle(
@@ -145,11 +214,11 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             onPressed: () {
                               if (_formKey.currentState?.validate() ?? false) {
-                                _login();
+                                _register();
                               }
                             },
                             child: const Text(
-                              'LOGIN',
+                              'REGISTER',
                               style: TextStyle(color: Colors.white),
                             ))),
                     const SizedBox(height: 30),
@@ -163,13 +232,13 @@ class _LoginPageState extends State<LoginPage> {
                 TextSpan(
                   children: [
                     const TextSpan(
-                      text: "Not a member? ",
+                      text: "Already joined us? ",
                     ),
                     TextSpan(
-                      text: 'Register Here!',
+                      text: 'Login Here!',
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          context.goNamed('register');
+                          context.goNamed('login');
                         },
                       style: const TextStyle(
                           color: TColor.prime1,
@@ -186,12 +255,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _login() async {
+  void _register() async {
     final authService = Provider.of<AuthService>(context, listen: false);
     final dialogWidgets = DialogWidgets(context);
 
     try {
-      await authService.login(emailController.text, passwordController.text);
+      await authService.register(emailController.text, passwordController.text);
     } catch (e) {
       dialogWidgets.showErrorDialog(message: e.toString());
     }

@@ -1,4 +1,4 @@
-import 'package:chat_app/firebase_auth/auth_services.dart';
+import 'package:chat_app/services/firebase_auth/auth_services.dart';
 import 'package:chat_app/firebase_options.dart';
 import 'package:chat_app/routes/route_config.dart';
 import 'package:firebase_core/firebase_core.dart';

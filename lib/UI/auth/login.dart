@@ -1,45 +1,38 @@
 // ignore_for_file: avoid_print
 
 import 'package:chat_app/components/dialog.dart';
-import 'package:chat_app/const/color.dart';
-import 'package:chat_app/firebase_auth/auth_services.dart';
+import 'package:chat_app/utils/color.dart';
+import 'package:chat_app/services/firebase_auth/auth_services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  bool _isPwdObscure = true;
-  bool _isPwd2Obscure = true;
+  bool _isPwdObscure = false;
 
-  late TextEditingController usernameController = TextEditingController();
-  late TextEditingController passwordController = TextEditingController();
   late TextEditingController emailController = TextEditingController();
-  late TextEditingController password2Controller = TextEditingController();
+  late TextEditingController passwordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    usernameController = TextEditingController();
-    passwordController = TextEditingController();
     emailController = TextEditingController();
-    password2Controller = TextEditingController();
+    passwordController = TextEditingController();
   }
 
   @override
   void dispose() {
-    usernameController.dispose();
-    passwordController.dispose();
     emailController.dispose();
-    password2Controller.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
@@ -47,6 +40,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     final isLandScape =
         MediaQuery.of(context).orientation == Orientation.landscape;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -55,21 +49,21 @@ class _RegisterPageState extends State<RegisterPage> {
           children: [
             isLandScape
                 ? const SizedBox(height: 40)
-                : const SizedBox(height: 180),
+                : const SizedBox(height: 250),
             const Center(
               child: Text.rich(
                 style: TextStyle(fontSize: 24),
                 TextSpan(
                   children: [
                     TextSpan(
-                      text: "Start your ",
+                      text: "Let's start ",
                     ),
                     TextSpan(
                       text: 'chat',
                       style: TextStyle(color: TColor.prime1),
                     ),
                     TextSpan(
-                      text: 'ting journey.',
+                      text: 'ting',
                     ),
                   ],
                 ),
@@ -88,40 +82,18 @@ class _RegisterPageState extends State<RegisterPage> {
                     SizedBox(
                       height: 40,
                       child: TextFormField(
-                        controller: usernameController,
-                        textInputAction: TextInputAction.next,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Enter Username';
-                          } else {
-                            return null;
-                          }
-                        },
-                        decoration: const InputDecoration(
-                            label: Text('USERNAME'),
-                            focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: TColor.prime1)),
-                            floatingLabelBehavior: FloatingLabelBehavior.never),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      height: 40,
-                      child: TextFormField(
                         controller: emailController,
-                        keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Enter Email Address';
+                            return 'Enter email';
                           } else {
                             return null;
                           }
                         },
                         decoration: const InputDecoration(
-                            label: Text('EMAIL ADDRESS'),
+                            label: Text('EMAIL'),
                             focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(color: TColor.prime1)),
                             floatingLabelBehavior: FloatingLabelBehavior.never),
@@ -132,19 +104,14 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: 40,
                       child: TextFormField(
                         controller: passwordController,
-                        textInputAction: TextInputAction.next,
+                        textInputAction: TextInputAction.done,
                         obscureText: _isPwdObscure,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Enter Password';
                           } else {
-                            if (password2Controller.text ==
-                                passwordController.text) {
-                              return null;
-                            } else {
-                              return 'Password Mismatch';
-                            }
+                            return null;
                           }
                         },
                         decoration: InputDecoration(
@@ -165,42 +132,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 20),
                     SizedBox(
-                      height: 40,
-                      child: TextFormField(
-                        controller: password2Controller,
-                        textInputAction: TextInputAction.done,
-                        obscureText: _isPwd2Obscure,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Confirm Password';
-                          } else {
-                            if (password2Controller.text ==
-                                passwordController.text) {
-                              return null;
-                            } else {
-                              return 'Password Mismatch';
-                            }
-                          }
-                        },
-                        decoration: InputDecoration(
-                            suffixIcon: ExcludeFocus(
-                              child: IconButton(
-                                  icon: _isPwd2Obscure
-                                      ? const Icon(Icons.visibility)
-                                      : const Icon(Icons.visibility_off),
-                                  onPressed: () {
-                                    setState(() {
-                                      _isPwd2Obscure = !_isPwd2Obscure;
-                                    });
-                                  }),
-                            ),
-                            label: const Text(' CONFIRM PASSWORD'),
-                            floatingLabelBehavior: FloatingLabelBehavior.never),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
                         width: MediaQuery.of(context).size.width * 0.5,
                         child: ElevatedButton(
                             style: ButtonStyle(
@@ -214,11 +145,11 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             onPressed: () {
                               if (_formKey.currentState?.validate() ?? false) {
-                                _register();
+                                _login();
                               }
                             },
                             child: const Text(
-                              'REGISTER',
+                              'LOGIN',
                               style: TextStyle(color: Colors.white),
                             ))),
                     const SizedBox(height: 30),
@@ -232,13 +163,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextSpan(
                   children: [
                     const TextSpan(
-                      text: "Already joined us? ",
+                      text: "Not a member? ",
                     ),
                     TextSpan(
-                      text: 'Login Here!',
+                      text: 'Register Here!',
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          context.goNamed('login');
+                          context.goNamed('register');
                         },
                       style: const TextStyle(
                           color: TColor.prime1,
@@ -255,12 +186,12 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  void _register() async {
+  void _login() async {
     final authService = Provider.of<AuthService>(context, listen: false);
     final dialogWidgets = DialogWidgets(context);
 
     try {
-      await authService.register(emailController.text, passwordController.text);
+      await authService.login(emailController.text, passwordController.text);
     } catch (e) {
       dialogWidgets.showErrorDialog(message: e.toString());
     }
